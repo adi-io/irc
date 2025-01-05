@@ -31,15 +31,19 @@ Client::Client(Client const &src)
 
 Client&  Client::operator=(Client const &src)
 {
-    this -> fd = src.fd;
-    this -> isOperator = src.isOperator;
-    this -> registered = src.registered;
-    this -> nickname = src.nickname;
-    this -> logedin = src.logedin;
-    this -> username = src.username;
-    this -> buffer = src.buffer;
-    this -> ipadd = src.ipadd;
-    this -> ChannelsInvite = src.ChannelsInvite;
+    if (this != &src)
+    {
+        this -> fd = src.fd;
+        this -> isOperator = src.isOperator;
+        this -> registered = src.registered;
+        this -> nickname = src.nickname;
+        this -> logedin = src.logedin;
+        this -> username = src.username;
+        this -> buffer = src.buffer;
+        this -> ipadd = src.ipadd;
+        this -> ChannelsInvite = src.ChannelsInvite;
+    }
+    return (*this);
 }
 
 int Client::GetFd()
@@ -89,7 +93,8 @@ std::string Client::getBuffer()
 
 std::string Client::getHostname()
 {
-    //return (//TODO);
+    std::string hostname = this -> GetNickName() + "!" + this -> GetUserName();
+    return (hostname);
 }
 
 void    Client::SetFd(int fd)
@@ -109,7 +114,7 @@ void    Client::SetUsername(std::string &user)
 
 void    Client::setBuffer(std::string buf)
 {
-    this -> buffer = buf;
+    this -> buffer += buf;
 }
 
 void    Client::setRegistered(bool val)
@@ -125,4 +130,21 @@ void    Client::setIpAdd(std::string ipadd)
 void    Client::clearBuffer()
 {
     buffer.clear();
+}
+
+void    Client::AddChannelInvite(std::string &chname)
+{
+    this -> ChannelsInvite.push_back(chname);
+}
+
+void    Client::RmChannelInvite(std::string &chname)
+{
+    for(int i = 0; i < this -> ChannelsInvite.size(); i++)
+    {
+        if (this -> ChannelsInvite[i] == chname)
+        {
+            this -> ChannelsInvite[i].erase(this -> ChannelsInvite.begin()+ i);
+            return ;
+        }
+    }
 }
