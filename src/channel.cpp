@@ -4,6 +4,7 @@
 #include <mutex>
 #include <string>
 #include <strstream>
+#include <sys/socket.h>
 #include <utility>
 #include <iostream>
 
@@ -120,7 +121,6 @@ int Channel::GetTopic()
 {
     return (this -> topic);
 }
-
 
 int Channel::GetKey()
 {
@@ -314,4 +314,38 @@ bool    Channel::change_adminToClient(std::string& nick)
         return (true);
     }
     return (false);
+}
+
+void    Channel::sendTo_all(std::string rpl1)
+{
+    for (int i = 0; i < this -> admins.size(); i++)
+    {
+        if (send(this -> admins[i].GetFd(), rpl1.c_str(), rpl1.size(), 0) == -1)
+                std::cerr << "send() to all failed";
+    }
+    for (int i = 0; i < this -> clients.size(); i++)
+    {
+        if (send(this -> clients[i].GetFd(), rpl1.c_str(), rpl1.size(), 0) == -1)
+                std::cerr << "send() to all failed";
+    }
+}
+
+void    Channel::sendTo_all(std::string rpl1, int fd)
+{
+    for (int i = 0; i < this -> admins.size(); i++)
+    {
+        if (this -> admins[i].GetFd() != fd)
+        {
+            if (send(this -> admins[i].GetFd(), rpl1.c_str(), rpl1.size(), 0) == -1)
+                std::cerr << "send() to all failed";
+        }
+    }
+    for (int i = 0; i < this -> clients.size(); i++)
+    {
+        if (this -> clients[i].GetFd() != fd)
+        {
+            if (send(this -> clients[i].GetFd(), rpl1.c_str(), rpl1.size(), 0) == -1)
+                std::cerr << "send() to all failed";
+        }
+    }
 }

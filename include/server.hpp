@@ -14,6 +14,10 @@
 #include <unistd.h>
 #include <string>
 #include <cstring>
+
+#include "replies.hpp"
+#include "client.hpp"
+#include "channel.hpp"
 // Color stuff starts here
 
 #define RED "\e[1;31m"
