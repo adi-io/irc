@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include "client.hpp"
 
 class Client;
 class Channel

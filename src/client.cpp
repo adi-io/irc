@@ -1,10 +1,8 @@
 #include "../include/client.hpp"
-#include <atomic>
+#include <cstddef>
 #include <iostream>
 #include <sched.h>
-#include <set>
 #include <string>
-#include <type_traits>
 #include <unistd.h>
 
 Client::Client()
@@ -58,7 +56,7 @@ bool    Client::getRegistered()
 
 bool    Client::GetInviteChannel(std::string &str)
 {
-    for(int i = 0; i < this -> ChannelsInvite.size(); i++)
+    for(size_t i = 0; i < this -> ChannelsInvite.size(); i++)
     {
         if (this -> ChannelsInvite[i] == str)
             return (true);
@@ -139,11 +137,11 @@ void    Client::AddChannelInvite(std::string &chname)
 
 void    Client::RmChannelInvite(std::string &chname)
 {
-    for(int i = 0; i < this -> ChannelsInvite.size(); i++)
+    for(size_t i = 0; i < this -> ChannelsInvite.size(); i++)
     {
         if (this -> ChannelsInvite[i] == chname)
         {
-            this -> ChannelsInvite[i].erase(this -> ChannelsInvite.begin()+ i);
+            this -> ChannelsInvite.erase(this -> ChannelsInvite.begin()+ i);
             return ;
         }
     }

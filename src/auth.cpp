@@ -1,4 +1,5 @@
 #include "../include/server.hpp"
+#include <cstddef>
 #include <string>
 #include <unistd.h>
 #include <vector>
@@ -7,7 +8,7 @@ void    Server::client_authen(int fd, std::string pass)
 {
     Client  *cli = GetClient(fd);
     pass = pass.substr(4);
-    int pos = pass.find_first_not_of("\t\v");
+    size_t pos = pass.find_first_not_of("\t\v");
     if (pos < pass.size())
     {
         pass = pass.substr(pos);
@@ -33,9 +34,9 @@ void    Server::client_authen(int fd, std::string pass)
 
 bool Server::is_validNickname(std::string& nickname)
 {
-    if (!nickname.empty() && nickname[0] == '#' || nickname[0] == '&' || nickname[0] == ':')
+    if ((!nickname.empty() && nickname[0] == '#') || nickname[0] == '&' || nickname[0] == ':')
         return (false);
-    for (int i = 0; i < nickname.size(); i++)
+    for (size_t i = 0; i < nickname.size(); i++)
     {
         if (!isalnum(nickname[i]) && nickname[i] != '_')
             return (false);
@@ -45,7 +46,7 @@ bool Server::is_validNickname(std::string& nickname)
 
 bool    Server::nickNameInUse(std::string& nickname)
 {
-    for (int i = 0; i < clients.size(); i++)
+    for (size_t i = 0; i < clients.size(); i++)
     {
         if (clients[i].GetNickName() == nickname)
             return (true);
@@ -58,7 +59,7 @@ void    Server::set_nickname(std::string cmd, int fd)
     std::string inuse;
     Client  *cli = GetClient(fd);
     cmd = cmd.substr(4);
-    int pos = cmd.find_first_not_of("\t\v");
+    size_t pos = cmd.find_first_not_of("\t\v");
     if (pos < cmd.size())
     {
         cmd = cmd.substr(pos);
@@ -83,7 +84,7 @@ void    Server::set_nickname(std::string cmd, int fd)
         {
             std::string oldnick = cli -> GetNickName();
             cli -> SetNickname(cmd);
-            for (int i = 0; i < channels.size(); i++)
+            for (size_t i = 0; i < channels.size(); i++)
             {
                 Client *cli = channels[i].GetClientInChannel(cmd);
                 if (cli)
@@ -101,7 +102,7 @@ void    Server::set_nickname(std::string cmd, int fd)
                 return ;
             }
         }
-        else (cli && !(cli -> getRegistered()))
+        if (cli && !(cli -> getRegistered()))
         {
             sendResponse(ERR_NOTREGISTERED(cmd), fd);
         }

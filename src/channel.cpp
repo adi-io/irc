@@ -1,9 +1,9 @@
 #include "../include/channel.hpp"
+#include <cmath>
 #include <cstddef>
 #include <ctime>
-#include <mutex>
+#include <sstream>
 #include <string>
-#include <strstream>
 #include <sys/socket.h>
 #include <utility>
 #include <iostream>
@@ -19,7 +19,7 @@ Channel::Channel()
 	created_at = "";
 	topic_name = "";
 	char   chars[5] = {'i', 't', 'k', 'o', 'l'};
-	for (int i = 0; i < 5; i++)
+	for (size_t i = 0; i < 5; i++)
 	   modes.push_back(std::make_pair(chars[i], false));
 }
 
@@ -107,7 +107,7 @@ void    Channel::setModeAtindex(size_t index, bool mode)
 void Channel::set_createiontime()
 {
     std::time_t _time = std::time(NULL);
-    std::ostrstream str;
+    std::ostringstream str;
     str << _time;
     this -> created_at = std::string(str.str());
 }
@@ -134,7 +134,7 @@ int Channel::GetLimit()
 
 int Channel::GetClientsNumber()
 {
-    int len = this -> clients.size();
+    size_t len = this -> clients.size();
     return (len);
 }
 
@@ -151,7 +151,7 @@ bool    Channel::getModeAtindex(size_t index)
 
 bool    Channel::clientInChannel(std::string &nick)
 {
-    for(int i = 0; i < clients.size(); i++)
+    for(size_t i = 0; i < clients.size(); i++)
     {
         if (this -> clients[i].GetNickName() == nick)
             return (true);
@@ -187,7 +187,7 @@ std::string Channel::get_creationtime()
 std::string Channel::getModes()
 {
     std::string str;
-    for (int i = 0; i < modes.size(); i++)
+    for (size_t i = 0; i < modes.size(); i++)
     {
         if (modes[i].first != 'o' && modes[i].second)
             str.push_back(modes[i].first);
@@ -202,7 +202,7 @@ std::string Channel::getModes()
 std::string Channel::clientChannel_list()
 {
     std::string list;
-    for (int i = 0; i < this -> admins.size(); i++)
+    for (size_t i = 0; i < this -> admins.size(); i++)
     {
         list += "@" + this-> admins[i].GetNickName();
         if ((i + 1) < admins.size())
@@ -210,7 +210,7 @@ std::string Channel::clientChannel_list()
     }
     if (clients.size())
         list += " ";
-    for (int i = 0; i < this -> clients.size(); i++)
+    for (size_t i = 0; i < this -> clients.size(); i++)
     {
         list += this-> clients[i].GetNickName();
         if ((i + 1) < clients.size())
@@ -221,7 +221,7 @@ std::string Channel::clientChannel_list()
 
 Client*  Channel::get_client(int fd)
 {
-    for (int i = 0; i < this-> clients.size(); i++)
+    for (size_t i = 0; i < this-> clients.size(); i++)
     {
         if (this -> clients[i].GetFd() == fd)
             return (&this -> clients[i]);
@@ -231,7 +231,7 @@ Client*  Channel::get_client(int fd)
 
 Client*  Channel::get_admin(int fd)
 {
-    for (int i = 0; i < this-> admins.size(); i++)
+    for (size_t i = 0; i < this-> admins.size(); i++)
     {
         if (this -> admins[i].GetFd() == fd)
             return (&this -> admins[i]);
@@ -241,18 +241,19 @@ Client*  Channel::get_admin(int fd)
 
 Client*  Channel::GetClientInChannel(std::string name)
 {
-    for (int i = 0; i < this-> clients.size(); i++)
+    for (size_t i = 0; i < this-> clients.size(); i++)
     {
         if (this -> clients[i].GetNickName() == name)
             return (&this -> clients[i]);
     }
-    for (int i = 0; i < this-> admins.size(); i++)
+    for (size_t i = 0; i < this-> admins.size(); i++)
     {
         if (this -> admins[i].GetNickName() == name)
             return (&this -> admins[i]);
     }
     return (NULL);
 }
+
 
 void    Channel::add_client(Client newClient)
 {
@@ -266,7 +267,7 @@ void    Channel::add_admin(Client newadmin)
 
 void    Channel::remove_client(int fd)
 {
-    for (int i = 0; i < this-> clients.size(); i++)
+    for (size_t i = 0; i < this-> clients.size(); i++)
     {
         if (this -> clients[i].GetFd() == fd)
             this -> clients.erase(i + clients.begin());
@@ -275,7 +276,7 @@ void    Channel::remove_client(int fd)
 
 void    Channel::remove_admin(int fd)
 {
-    for (int i = 0; i < this-> admins.size(); i++)
+    for (size_t i = 0; i < this-> admins.size(); i++)
     {
         if (this -> admins[i].GetFd() == fd)
             this -> admins.erase(i + clients.begin());
@@ -284,7 +285,7 @@ void    Channel::remove_admin(int fd)
 
 bool    Channel::change_clientToAdmin(std::string& nick)
 {
-    int i = 0;
+    size_t i = 0;
     for (; i < this -> clients.size(); i++)
     {
         if (this -> clients[i].GetNickName() == nick)
@@ -301,7 +302,7 @@ bool    Channel::change_clientToAdmin(std::string& nick)
 
 bool    Channel::change_adminToClient(std::string& nick)
 {
-    int i = 0;
+    size_t i = 0;
     for (; i < this -> admins.size(); i++)
     {
         if (this -> admins[i].GetNickName() == nick)
@@ -318,12 +319,12 @@ bool    Channel::change_adminToClient(std::string& nick)
 
 void    Channel::sendTo_all(std::string rpl1)
 {
-    for (int i = 0; i < this -> admins.size(); i++)
+    for (size_t i = 0; i < this -> admins.size(); i++)
     {
         if (send(this -> admins[i].GetFd(), rpl1.c_str(), rpl1.size(), 0) == -1)
                 std::cerr << "send() to all failed";
     }
-    for (int i = 0; i < this -> clients.size(); i++)
+    for (size_t i = 0; i < this -> clients.size(); i++)
     {
         if (send(this -> clients[i].GetFd(), rpl1.c_str(), rpl1.size(), 0) == -1)
                 std::cerr << "send() to all failed";
@@ -332,7 +333,7 @@ void    Channel::sendTo_all(std::string rpl1)
 
 void    Channel::sendTo_all(std::string rpl1, int fd)
 {
-    for (int i = 0; i < this -> admins.size(); i++)
+    for (size_t i = 0; i < this -> admins.size(); i++)
     {
         if (this -> admins[i].GetFd() != fd)
         {
@@ -340,7 +341,7 @@ void    Channel::sendTo_all(std::string rpl1, int fd)
                 std::cerr << "send() to all failed";
         }
     }
-    for (int i = 0; i < this -> clients.size(); i++)
+    for (size_t i = 0; i < this -> clients.size(); i++)
     {
         if (this -> clients[i].GetFd() != fd)
         {

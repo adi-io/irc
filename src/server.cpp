@@ -1,9 +1,9 @@
 #include "../include/server.hpp"
+#include <cstddef>
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <strstream>
 #include <sys/poll.h>
 #include <vector>
 
@@ -58,9 +58,9 @@ Client  *Server::GetClient(int fd)
 {
     if (fd < 3)
         return (NULL);
-    for (int i = 0; i < this -> clients.size(); i++)
+    for (size_t i = 0; i < this -> clients.size(); i++)
     {
-        if (this -> clients[i].get_Fd() == fd)
+        if (this -> clients[i].GetFd() == fd)
             return (&this -> clients[i]);
     }
     return (NULL);
@@ -70,17 +70,22 @@ Client  *Server::GetClientNick(std::string name)
 {
     if (name.empty())
         return (NULL);
-    for (int i = 0; i < this -> clients.size(); i++)
+    for (size_t i = 0; i < this -> clients.size(); i++)
     {
-        if (this -> clients[i].get_NickName() == name)
+        if (this -> clients[i].GetNickName() == name)
             return (&this -> clients[i]);
     }
     return (NULL);
 }
 
-Channel *Server::GetChannel(std::string)
+Channel *Server::GetChannel(std::string name)
 {
-    //TODO
+    for (size_t i = 0; i < this -> channels.size(); i++)
+    {
+        if (this -> channels[i].GetName() == name)
+            return (&this -> channels[i]);
+    }
+    return (NULL);
 }
 
 void    Server::SetFd(int fd)
@@ -96,6 +101,11 @@ void    Server::SetPort(int num)
 void    Server::SetPassword(std::string str)
 {
     this -> password = str;
+}
+
+void Client::setLogedin(bool value)
+{
+    this->logedin = value;
 }
 
 void    Server::AddClient(Client client)
@@ -115,9 +125,9 @@ void    Server::AddFds(pollfd fd)
 
 void    Server::RemoveClient(int fd)
 {
-    for (int i = 0; i < this -> clients.size(); i++)
+    for (size_t i = 0; i < this -> clients.size(); i++)
     {
-        if (this -> clients[i].get_Fd() == fd)
+        if (this -> clients[i].GetFd() == fd)
         {
             this -> clients.erase(this -> clients.begin() + i);
             return ;
@@ -127,9 +137,9 @@ void    Server::RemoveClient(int fd)
 
 void    Server::RemoveChannel(std::string name)
 {
-    for (int i = 0; i < this -> channels.size(); i++)
+    for (size_t i = 0; i < this -> channels.size(); i++)
     {
-        if (this -> channels[i].get_Name() == name)
+        if (this -> channels[i].GetName() == name)
         {
             this -> channels.erase(this -> channels.begin() + i);
             return ;
@@ -137,19 +147,38 @@ void    Server::RemoveChannel(std::string name)
     }
 }
 
-void    Server::RmChannels(std::string name)
+void    Server::RmChannels(int fd)
 {
-    for (int i = 0; i < this -> channels.size(); i++)
+    for (size_t i = 0; i < this -> channels.size(); i++)
     {
-        //TODO OTHER CLEANUP
-        this -> channels.erase(this -> channels.begin() + i);
-        return ;
+        int flag = 0;
+        if (channels[i].get_client(fd))
+        {
+            channels[i].remove_client(fd);
+            flag = 1;
+        }
+        if (channels[i].get_admin(fd))
+        {
+            channels[i].remove_admin(fd);
+            flag = 1;
+        }
+        if (channels[i].GetClientsNumber() == 0)
+        {
+            channels.erase(channels.begin() + i);
+            i--;
+            continue;
+        }
+        if (flag)
+        {
+            std::string mesg = ":" + GetClient(fd) -> GetNickName() + ":~" + GetClient(fd) -> GetUserName() + "@localhost QUIT Quit\r\n";
+            channels[i].sendTo_all(mesg);
+        }
     }
 }
 
 void    Server::RemoveFds(int fd)
 {
-    for (int i = 0; i < this -> fds.size(); i++)
+    for (size_t i = 0; i < this -> fds.size(); i++)
     {
         if (this -> fds[i].fd == fd)
         {
@@ -177,33 +206,47 @@ void    senderror(int code, std::string clientname, std::string channelname, int
         std::cerr << "send() failed" << std::endl;
 }
 
-
 void    sendResponse(std::string response, int fd)
 {
     if (send(fd, response.c_str(), response.size(), 0) == -1)
         std::cerr << "Response send() failed" << std::endl;
 }
 
-
-
-void Server::ClearClients(int fd)
+void Server::parse_exec_cmd(std::string &cmd, int fd)
 {
-    for (size_t i = 0; i < fds.size(); i++)
+    if (cmd.empty())
+        return ;
+    std::vector<std::string> splited_cmd = split_cmd(cmd);
+    size_t found = cmd.find_first_not_of(" \t\v");
+    if (found != std::string::npos)
+        cmd = cmd.substr(found);
+    if (splited_cmd.size() && (splited_cmd[0] == "BONG" || splited_cmd[0] == "bong"))
+        return;
+    if (splited_cmd.size() && (splited_cmd[0] == "PASS" || splited_cmd[0] == "pass"))
+    client_authen(fd, cmd);
+    else if (splited_cmd.size() && (splited_cmd[0] == "NICK" || splited_cmd[0] == "nick"))
+    set_nickname(cmd,fd);
+    else if(splited_cmd.size() && (splited_cmd[0] == "USER" || splited_cmd[0] == "user"))
+    set_username(cmd, fd);
+
+    else if(notregistered(fd))
     {
-        if (fds[i].fd == fd)
-        {
-            fds.erase(fds.begin() + i);
-            break;
-        }
-    }
-    for (size_t i = 0; i < clients.size(); i++)
-    {
-        if (clients[i].get_Fd() == fd)
-        {
-            clients.erase(clients.begin() + i);
-            break;
-        }
-    }
+        if (splited_cmd.size() && (splited_cmd[0] == "KICK" || splited_cmd[0] == "kick"))
+            std::cout << "command -> KICK" << std::endl;
+        if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
+            std::cout << "command -> JOIN " << std::endl;
+		if (splited_cmd.size() && (splited_cmd[0] == "TOPIC" || splited_cmd[0] == "topic"))
+		    std::cout << "command -> TOPIC" << std::endl;
+		if (splited_cmd.size() && (splited_cmd[0] == "MODE" || splited_cmd[0] == "mode"))
+		    std::cout << "command -> MODE" << std::endl;
+		if (splited_cmd.size() && (splited_cmd[0] == "PART" || splited_cmd[0] == "part"))
+		    std::cout << "command -> PART" << std::endl;
+		if (splited_cmd.size())
+			sendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(),splited_cmd[0]),fd);
+	}
+
+    else if (!notregistered(fd))
+        sendResponse(ERR_NOTREGISTERED(std::string("*")),fd);
 }
 
 void Server::accept_new_client()
@@ -227,8 +270,8 @@ void Server::accept_new_client()
     new_cli.events = POLLIN;
     new_cli.revents = 0;
 
-    cli.set_Fd(intcofd);
-    cli.set_IPadd(inet_ntoa((cliadd.sin_addr)));
+    cli.SetFd(intcofd);
+    cli.setIpAdd((inet_ntoa((cliadd.sin_addr))));
     clients.push_back(cli);
     fds.push_back(new_cli);
 
@@ -253,15 +296,15 @@ void    Server::reciveNewData(int fd)
     }
     else
     {
-        cli -> set_buffer(buff);
-        if (cli -> get_buffer().find_first_of("\r\n") == std::string::npos)
+        cli -> setBuffer(buff);
+        if (cli -> getBuffer().find_first_of("\r\n") == std::string::npos)
             return ;
 
-        cmd =  split_recivedBuffer(cli -> get_buffer());
-        for (int i = 0, i < cmd.size(), i++)
-            parse_exec_cmd(cmd, fd);
+        std::vector<std::string> cmd =  split_recivedBuffer(cli -> getBuffer());
+        for (size_t i = 0; i < cmd.size(); i++)
+            parse_exec_cmd(cmd[i], fd);
         if (GetClient(fd))
-            GetClient(fd) -> clear_buffer();
+            GetClient(fd) -> clearBuffer();
     }
 }
 
@@ -274,7 +317,7 @@ std::vector<std::string>    Server::split_recivedBuffer(std::string str)
 
     while (std::getline(ss, snew))
     {
-        int pos = snew.find_first_of("\r\n");
+        size_t pos = snew.find_first_of("\r\n");
         if (pos != std::string::npos)
             snew = snew.substr(0, pos);
         vec.push_back(snew);
@@ -309,8 +352,8 @@ void    Server::close_fds()
 {
     for(size_t i = 0; i < clients.size(); i ++)
         {
-            std::cout << RED << "Client <" << clients[i].get_Fd() << "> Disconnected" << std::endl;
-            close(clients[i].get_Fd());
+            std::cout << RED << "Client <" << clients[i].GetFd() << "> Disconnected" << std::endl;
+            close(clients[i].GetFd());
         }
         if (ServerSocketFd != -1)
         {
@@ -371,4 +414,18 @@ void    Server::init(int port, std::string pass)
             }
     }
     this -> close_fds();
+}
+
+void Server::sendResponse(std::string response, int fd)
+{
+    if (send(fd, response.c_str(), response.size(), 0) == -1)
+        std::cerr << "Response send() failed" << std::endl;
+}
+
+bool Server::notregistered(int fd)
+{
+    Client* client = GetClient(fd);
+    if (!client || !client->getRegistered())
+        return false;
+    return true;
 }
