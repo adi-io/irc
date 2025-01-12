@@ -91,6 +91,12 @@ class Server
            	bool nickNameInUse(std::string& nickname);
            	bool is_validNickname(std::string& nickname);
            	void client_authen(int fd, std::string pass);
+			// --------------//COMMANDS IMPLEMENTATION
+			// JOIN
+			// PRIVMSG
+			void PRIVMSG(int fd, std::string cmd);
+			void validateRecipients(std::vector<std::string> &tmp, int fd);
+
 };
 
 #endif

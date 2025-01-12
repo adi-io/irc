@@ -8,7 +8,7 @@ void    Server::client_authen(int fd, std::string pass)
 {
     Client  *cli = GetClient(fd);
     pass = pass.substr(4);
-    size_t pos = pass.find_first_not_of("\t\v");
+    size_t pos = pass.find_first_not_of(" \t\v");
     if (pos < pass.size())
     {
         pass = pass.substr(pos);
@@ -34,12 +34,19 @@ void    Server::client_authen(int fd, std::string pass)
 
 bool Server::is_validNickname(std::string& nickname)
 {
+    std::cout << "Validating nickname: " << nickname << std::endl;
     if ((!nickname.empty() && nickname[0] == '#') || nickname[0] == '&' || nickname[0] == ':')
+    {
+        std::cout << "Invalid start character: " << nickname[0] << std::endl;
         return (false);
+    }
     for (size_t i = 0; i < nickname.size(); i++)
     {
         if (!isalnum(nickname[i]) && nickname[i] != '_')
+        {
+            std::cout << "Invalid character: " << nickname[i] << std::endl;
             return (false);
+        }
     }
     return (true);
 }
@@ -59,7 +66,7 @@ void    Server::set_nickname(std::string cmd, int fd)
     std::string inuse;
     Client  *cli = GetClient(fd);
     cmd = cmd.substr(4);
-    size_t pos = cmd.find_first_not_of("\t\v");
+    size_t pos = cmd.find_first_not_of(" \t\v");
     if (pos < cmd.size())
     {
         cmd = cmd.substr(pos);
