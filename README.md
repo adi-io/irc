@@ -11,6 +11,7 @@ reference at https://modern.ircdocs.horse/#privmsg-message
 - TOPIC
 - MODE
 - PART
+- PRIVMSG
 
 # KICK
 The `KICK` command is used to remove a user from a channel. The command requires the channel name and the nickname of the user to be removed. An optional comment can also be included to specify the reason for the kick.

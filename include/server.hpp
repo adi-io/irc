@@ -93,6 +93,11 @@ class Server
            	void client_authen(int fd, std::string pass);
 			// --------------//COMMANDS IMPLEMENTATION
 			// JOIN
+			void JOIN(int fd, std::string cmd);
+			int parseJoinCommand(std::string cmd, std::vector<std::pair<std::string, std::string> > token, int fd);
+			int clientCheckCount(std::string nick);
+			void handleJoinExistingChannel(int fd, std::vector<std::pair<std::string, std::string> > token, int i, int j);
+			void handleJoinNewChannel(int fd, std::vector<std::pair<std::string, std::string> > token, int i);
 			// PRIVMSG
 			void PRIVMSG(int fd, std::string cmd);
 			void validateRecipients(std::vector<std::string> &tmp, int fd);

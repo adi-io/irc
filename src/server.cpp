@@ -234,7 +234,7 @@ void Server::parse_exec_cmd(std::string &cmd, int fd)
         if (splited_cmd.size() && (splited_cmd[0] == "KICK" || splited_cmd[0] == "kick"))
             std::cout << "command -> KICK" << std::endl;
         else if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
-            std::cout << "command -> JOIN " << std::endl;
+            JOIN(fd, cmd);
 		else if (splited_cmd.size() && (splited_cmd[0] == "TOPIC" || splited_cmd[0] == "topic"))
 		    std::cout << "command -> TOPIC" << std::endl;
 		else if (splited_cmd.size() && (splited_cmd[0] == "MODE" || splited_cmd[0] == "mode"))
