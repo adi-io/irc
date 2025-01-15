@@ -14,6 +14,7 @@
 #define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list" + CRLF)
 #define RPL_TOPICIS(nickname, channelname, topic) (": 332 " + nickname + " #" +channelname + " :" + topic + "\r\n")
 #define RPL_NOTOPIC(nickname, channelname) (": 331 " + nickname + " #" + channelname + " :No topic is set" + CRLF)
+#define RPL_TOPICWHOTIME(nickname, channelname, topic, setby, settime) ": 333 " + nickname + " #" + channelname + " " + topic + " " + setby + " " + settime + CRLF
 
 #define EEE_NEEDMODEPARM(channelname, mode) (": 696 #" + channelname + "You must specify the parameter for the key mode" + mode + CRLF)
 #define ERR_INVALIDMODEPARM(channelname, mode) ": 696 #" + channelname + " Invalid mode parameter. " + mode + CRLF
