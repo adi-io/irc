@@ -188,7 +188,7 @@ void    Server::RemoveFds(int fd)
     }
 }
 
-void    Server::senderror(int code, std::string clientname, int fd, std::string msg)
+void    Server::SendError(int code, std::string clientname, int fd, std::string msg)
 {
     std::stringstream ss;
     ss << ":localhost " << code << " " << clientname << msg;
@@ -197,7 +197,7 @@ void    Server::senderror(int code, std::string clientname, int fd, std::string 
         std::cerr << "send() failed" << std::endl;
 }
 
-void    Server::senderror(int code, std::string clientname, std::string channelname, int fd, std::string msg)
+void    Server::SendError(int code, std::string clientname, std::string channelname, int fd, std::string msg)
 {
     std::stringstream ss;
     ss << ":localhost " << code << " " << clientname << " " << channelname << msg;
@@ -207,7 +207,7 @@ void    Server::senderror(int code, std::string clientname, std::string channeln
 }
 
 
-void    sendResponse(std::string response, int fd)
+void    SendResponse(std::string response, int fd)
 {
     if (send(fd, response.c_str(), response.size(), 0) == -1)
         std::cerr << "Response send() failed" << std::endl;
@@ -247,12 +247,12 @@ void Server::parse_exec_cmd(std::string &cmd, int fd)
 			PRIVMSG(fd, cmd);
 
 		else if (splited_cmd.size())
-			sendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(),splited_cmd[0]),fd);
+			SendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(),splited_cmd[0]),fd);
 
 	}
 
     else if (!notregistered(fd))
-        sendResponse(ERR_NOTREGISTERED(std::string("*")),fd);
+        SendResponse(ERR_NOTREGISTERED(std::string("*")),fd);
 }
 
 void Server::accept_new_client()
@@ -422,7 +422,7 @@ void    Server::init(int port, std::string pass)
     this -> close_fds();
 }
 
-void Server::sendResponse(std::string response, int fd)
+void Server::SendResponse(std::string response, int fd)
 {
     if (send(fd, response.c_str(), response.size(), 0) == -1)
         std::cerr << "Response send() failed" << std::endl;

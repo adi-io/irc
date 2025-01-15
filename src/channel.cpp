@@ -94,12 +94,12 @@ void    Channel::SetTime(std::string time)
     this -> time_creation = time;
 }
 
-void    Channel::set_topicRestriction(bool value)
+void    Channel::SetTopicRestriction(bool value)
 {
     this -> topic_restriction = value;
 }
 
-void    Channel::setModeAtindex(size_t index, bool mode)
+void    Channel::SetModeAtindex(size_t index, bool mode)
 {
     modes[index].second = mode;
 }
@@ -143,7 +143,7 @@ bool    Channel::Gettopic_restriction() const
     return (this -> topic_restriction);
 }
 
-bool    Channel::getModeAtindex(size_t index)
+bool    Channel::GetModeAtIndex(size_t index)
 {
     return (modes[index].second);
 }

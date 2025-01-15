@@ -37,8 +37,8 @@ public:
 	void SetPassword(std::string password);
 	void SetName(std::string name);
 	void SetTime(std::string time);
-	void set_topicRestriction(bool value);
-	void setModeAtindex(size_t index, bool mode);
+	void SetTopicRestriction(bool value);
+	void SetModeAtindex(size_t index, bool mode);
 	void set_createiontime();
 	//---------------//Getters
 	int GetInvitOnly();
@@ -47,7 +47,7 @@ public:
 	int GetLimit();
 	int GetClientsNumber();
 	bool Gettopic_restriction() const;
-	bool getModeAtindex(size_t index);
+	bool GetModeAtIndex(size_t index);
 	bool clientInChannel(std::string &nick);
 	std::string GetTopicName();
 	std::string GetPassword();
