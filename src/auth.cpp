@@ -98,16 +98,18 @@ void    Server::set_nickname(std::string cmd, int fd)
                     cli -> SetNickname(cmd);
             }
             if (!oldnick.empty() && oldnick != cmd)
-            {
-                cli -> setLogedin(true);
-                sendResponse(RPL_CONNECTED(cli -> GetNickName()), fd);
-                sendResponse(RPL_NICKCHANGE(cli -> GetNickName(), cmd), fd);
-            }
-            else
-            {
-                sendResponse(RPL_NICKCHANGE(oldnick, cmd), fd);
-                return ;
-            }
+			{
+				if (oldnick == "*" && !cli->GetUserName().empty()){
+						cli -> setLogedin(true);
+						sendResponse(RPL_CONNECTED(cli -> GetNickName()), fd);
+						sendResponse(RPL_NICKCHANGE(cli -> GetNickName(), cmd), fd);
+					}
+					else
+					{
+						sendResponse(RPL_NICKCHANGE(oldnick, cmd), fd);
+						return ;
+					}
+				}
         }
         if (cli && !(cli -> getRegistered()))
         {

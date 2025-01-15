@@ -200,11 +200,12 @@ void    Server::senderror(int code, std::string clientname, int fd, std::string 
 void    Server::senderror(int code, std::string clientname, std::string channelname, int fd, std::string msg)
 {
     std::stringstream ss;
-    ss << ":localhost " << code << " " << clientname << channelname << msg;
+    ss << ":localhost " << code << " " << clientname << " " << channelname << msg;
     std::string str = ss.str();
     if (send(fd, str.c_str(), str.size(), 0) == -1)
         std::cerr << "send() failed" << std::endl;
 }
+
 
 void    sendResponse(std::string response, int fd)
 {
@@ -236,7 +237,7 @@ void Server::parse_exec_cmd(std::string &cmd, int fd)
         else if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
             JOIN(fd, cmd);
 		else if (splited_cmd.size() && (splited_cmd[0] == "TOPIC" || splited_cmd[0] == "topic"))
-		    std::cout << "command -> TOPIC" << std::endl;
+		    TOPIC(fd, cmd);
 		else if (splited_cmd.size() && (splited_cmd[0] == "MODE" || splited_cmd[0] == "mode"))
 		    std::cout << "command -> MODE" << std::endl;
 		else if (splited_cmd.size() && (splited_cmd[0] == "PART" || splited_cmd[0] == "part"))
