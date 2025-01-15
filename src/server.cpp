@@ -188,25 +188,26 @@ void    Server::RemoveFds(int fd)
     }
 }
 
-void    senderror(int code, std::string clientname, int fd, std::string msg)
+void    Server::SendError(int code, std::string clientname, int fd, std::string msg)
 {
     std::stringstream ss;
-    ss << ":localhost" << code << " " << clientname << msg;
+    ss << ":localhost " << code << " " << clientname << msg;
     std::string str = ss.str();
     if (send(fd, str.c_str(), str.size(), 0) == -1)
         std::cerr << "send() failed" << std::endl;
 }
 
-void    senderror(int code, std::string clientname, std::string channelname, int fd, std::string msg)
+void    Server::SendError(int code, std::string clientname, std::string channelname, int fd, std::string msg)
 {
     std::stringstream ss;
-    ss << ":localhost" << code << " " << clientname << channelname << msg;
+    ss << ":localhost " << code << " " << clientname << " " << channelname << msg;
     std::string str = ss.str();
     if (send(fd, str.c_str(), str.size(), 0) == -1)
         std::cerr << "send() failed" << std::endl;
 }
 
-void    sendResponse(std::string response, int fd)
+
+void    SendResponse(std::string response, int fd)
 {
     if (send(fd, response.c_str(), response.size(), 0) == -1)
         std::cerr << "Response send() failed" << std::endl;
@@ -233,20 +234,25 @@ void Server::parse_exec_cmd(std::string &cmd, int fd)
     {
         if (splited_cmd.size() && (splited_cmd[0] == "KICK" || splited_cmd[0] == "kick"))
             std::cout << "command -> KICK" << std::endl;
-        if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
-            std::cout << "command -> JOIN " << std::endl;
-		if (splited_cmd.size() && (splited_cmd[0] == "TOPIC" || splited_cmd[0] == "topic"))
-		    std::cout << "command -> TOPIC" << std::endl;
-		if (splited_cmd.size() && (splited_cmd[0] == "MODE" || splited_cmd[0] == "mode"))
+        else if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
+            JOIN(fd, cmd);
+		else if (splited_cmd.size() && (splited_cmd[0] == "TOPIC" || splited_cmd[0] == "topic"))
+		    TOPIC(fd, cmd);
+		else if (splited_cmd.size() && (splited_cmd[0] == "MODE" || splited_cmd[0] == "mode"))
 		    std::cout << "command -> MODE" << std::endl;
-		if (splited_cmd.size() && (splited_cmd[0] == "PART" || splited_cmd[0] == "part"))
+		else if (splited_cmd.size() && (splited_cmd[0] == "PART" || splited_cmd[0] == "part"))
 		    std::cout << "command -> PART" << std::endl;
-		if (splited_cmd.size())
-			sendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(),splited_cmd[0]),fd);
+
+		else if (splited_cmd.size() && (splited_cmd[0] == "PRIVMSG" || splited_cmd[0] == "privmsg"))
+			PRIVMSG(fd, cmd);
+
+		else if (splited_cmd.size())
+			SendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(),splited_cmd[0]),fd);
+
 	}
 
     else if (!notregistered(fd))
-        sendResponse(ERR_NOTREGISTERED(std::string("*")),fd);
+        SendResponse(ERR_NOTREGISTERED(std::string("*")),fd);
 }
 
 void Server::accept_new_client()
@@ -416,7 +422,7 @@ void    Server::init(int port, std::string pass)
     this -> close_fds();
 }
 
-void Server::sendResponse(std::string response, int fd)
+void Server::SendResponse(std::string response, int fd)
 {
     if (send(fd, response.c_str(), response.size(), 0) == -1)
         std::cerr << "Response send() failed" << std::endl;

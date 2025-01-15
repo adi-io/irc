@@ -13,9 +13,13 @@
 #define RPL_NAMREPLY(nickname, channelname, clientslist) (": 353 " + nickname + " @ #" + channelname + " :" + clientslist + CRLF)
 #define RPL_ENDOFNAMES(nickname, channelname) (": 366 " + nickname + " #" + channelname + " :END of /NAMES list" + CRLF)
 #define RPL_TOPICIS(nickname, channelname, topic) (": 332 " + nickname + " #" +channelname + " :" + topic + "\r\n")
+#define RPL_TOPIC(nickname, channelname, topic) (": 332 " + nickname + " #" + channelname + " :" + topic + CRLF)
+#define RPL_NOTOPIC(nickname, channelname) (": 331 " + nickname + " #" + channelname + " :No topic is set" + CRLF)
+#define RPL_TOPICWHOTIME(nickname, channelname, topic, setby, settime) ": 333 " + nickname + " #" + channelname + " " + topic + " " + setby + " " + settime + CRLF
 
 #define EEE_NEEDMODEPARM(channelname, mode) (": 696 #" + channelname + "You must specify the parameter for the key mode" + mode + CRLF)
 #define ERR_INVALIDMODEPARM(channelname, mode) ": 696 #" + channelname + " Invalid mode parameter. " + mode + CRLF
+#define ERR_NEEDMODEPARM(nickname, mode) (": 696 " + nickname + " " + mode + " :You must specify a parameter for the mode" + CRLF)
 #define ERR_KEYSET(channelname) ": 467 #" + channelname + " Channel key already set. " + CRLF
 #define ERR_UNKNOWNMODE(nickname, channelname, mode) ": 472 " + nickname + " #" + channelname + " " + mode + " :is not a recognised channel mode" + CRLF
 #define ERR_NOTENOUGHPARAM(nickname) (": 461 " + nickname + " :Not enough parameters." + CRLF)
@@ -29,3 +33,4 @@
 #define ERR_ERRONEUSNICK(nickname) (": 432 " + nickname + " :Erroneus nickname" + CRLF)
 #define ERR_NOTREGISTERED(nickname) (": 451 " + nickname + " :You have not registered!" + CRLF)
 #define ERR_CMDNOTFOUND(nickname, command) (": 421 " + nickname + " " + command + " :Unknown command" + CRLF)
+#define ERR_NEEDMOREPARAMS(nickname, command) (": 461 " + nickname + " " + command + " :Not enough parameters" + CRLF)
