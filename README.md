@@ -1,17 +1,25 @@
 ### TO RUN:
-./ircserv 8080 mypassword
+compile with make
+
+./ircserv 6667 mypassword
 
 
 
 reference at https://modern.ircdocs.horse/#privmsg-message
 
 #### todo implement 6 commands:
-- KICK
-- JOIN
-- TOPIC
-- MODE
-- PART
-- PRIVMSG
+- [KICK](#kick)
+- [JOIN](#join)
+- [TOPIC](#topic)
+- [MODE](#mode)
+- [PART](#part)
+- [PRIVMSG](#privmsg)
+
+#### also added:
+- [QUIT](#quit)
+- [INVITE](#invite)
+
+(LIST will work without being registered -- testing and eval. purposes)
 
 # KICK
 The `KICK` command is used to remove a user from a channel. The command requires the channel name and the nickname of the user to be removed. An optional comment can also be included to specify the reason for the kick.
@@ -28,51 +36,68 @@ The `KICK` command is used to remove a user from a channel. The command requires
 
 In this example, the user `JohnDoe` is removed from the channel `#exampleChannel` with the comment "Spamming is not allowed".
 
-### Sending Commands:
-To send the `KICK` command to the IRC server, you would typically use the IRC client interface. Here is an example of how you might send the command programmatically:
-
-```cpp
-std::string channel = "#exampleChannel";
-std::string user = "JohnDoe";
-std::string comment = "Spamming is not allowed";
-std::string command = "KICK " + channel + " " + user + " :" + comment + "\r\n";
-send(socket, command.c_str(), command.length(), 0);
-```
-
-This code constructs the `KICK` command string and sends it to the IRC server using a socket.
-
-
-
 # JOIN
-The `JOIN` command is used to enter a channel. The command requires the channel name and an optional key if the channel is password protected.
+The `JOIN` command is used to join a channel. The command requires the channel name.
 
 ### Usage:
 ```
-/JOIN <channel> [<key>]
+/JOIN <channel>
 ```
 
 ### Example:
 ```
-/JOIN #exampleChannel mypassword
+/JOIN #exampleChannel
 ```
 
-In this example, the user joins the channel `#exampleChannel` with the key `mypassword`.
+In this example, the user joins the channel `#exampleChannel`.
 
-### Sending Commands:
-To send the `JOIN` command to the IRC server, you would typically use the IRC client interface. Here is an example of how you might send the command programmatically:
+# TOPIC
+The `TOPIC` command is used to set or view the topic of a channel. The command requires the channel name and optionally the new topic.
 
-```cpp
-std::string channel = "#exampleChannel";
-std::string key = "mypassword";
-std::string command = "JOIN " + channel + " " + key + "\r\n";
-send(socket, command.c_str(), command.length(), 0);
+### Usage:
+```
+/TOPIC <channel> [<topic>]
 ```
 
-This code constructs the `JOIN` command string and sends it to the IRC server using a socket.
+### Example:
+```
+/TOPIC #exampleChannel "New topic for the channel"
+```
 
+In this example, the topic of the channel `#exampleChannel` is set to "New topic for the channel".
+
+# MODE
+The `MODE` command is used to change the mode of a user or a channel. The command requires the target (user or channel) and the mode to be set.
+
+### Usage:
+```
+/MODE <target> <mode>
+```
+
+### Example:
+```
+/MODE #exampleChannel +o JohnDoe
+```
+
+In this example, the user `JohnDoe` is given operator status in the channel `#exampleChannel`.
+
+# PART
+The `PART` command is used to leave a channel. The command requires the channel name.
+
+### Usage:
+```
+/PART <channel>
+```
+
+### Example:
+```
+/PART #exampleChannel
+```
+
+In this example, the user leaves the channel `#exampleChannel`.
 
 # PRIVMSG
-The `PRIVMSG` command is used to send private messages to a user or a channel. The command requires the target (either a user or a channel) and the message to be sent.
+The `PRIVMSG` command is used to send a private message to a user or a channel. The command requires the target (user or channel) and the message.
 
 ### Usage:
 ```
@@ -81,48 +106,37 @@ The `PRIVMSG` command is used to send private messages to a user or a channel. T
 
 ### Example:
 ```
-/PRIVMSG #exampleChannel Hello, everyone!
+/PRIVMSG JohnDoe "Hello, how are you?"
 ```
 
-In this example, the message `Hello, everyone!` is sent to the channel `#exampleChannel`.
+In this example, a private message "Hello, how are you?" is sent to the user `JohnDoe`.
 
-### Sending Commands:
-To send the `PRIVMSG` command to the IRC server, you would typically use the IRC client interface. Here is an example of how you might send the command programmatically:
-
-```cpp
-std::string target = "#exampleChannel";
-std::string message = "Hello, everyone!";
-std::string command = "PRIVMSG " + target + " :" + message + "\r\n";
-send(socket, command.c_str(), command.length(), 0);
-```
-
-This code constructs the `PRIVMSG` command string and sends it to the IRC server using a socket.
-
-# Sending to Multiple Users or Channels
-To send a command to multiple users or channels, you can specify multiple targets separated by commas.
+# QUIT
+The `QUIT` command is used to disconnect from the server. An optional comment can be included to specify the reason for quitting.
 
 ### Usage:
 ```
-/COMMAND <target1,target2,...> <message>
+/QUIT [<comment>]
 ```
 
 ### Example:
 ```
-/PRIVMSG #channel1,#channel2 Hello, everyone!
+/QUIT "Goodbye!"
 ```
 
-In this example, the message `Hello, everyone!` is sent to both `#channel1` and `#channel2`.
+In this example, the user disconnects from the server with the comment "Goodbye!".
 
-### Sending Commands:
-To send the `PRIVMSG` command to multiple targets programmatically, you can construct the command string with multiple targets separated by commas:
+# INVITE
+The `INVITE` command is used to invite a user to a channel. The command requires the nickname of the user to be invited and the channel name.
 
-```cpp
-std::string targets = "#channel1,#channel2";
-std::string message = "Hello, everyone!";
-std::string command = "PRIVMSG " + targets + " :" + message + "\r\n";
-send(socket, command.c_str(), command.length(), 0);
+### Usage:
+```
+/INVITE <user> <channel>
 ```
 
-This code constructs the `PRIVMSG` command string with multiple targets and sends it to the IRC server using a socket.
+### Example:
+```
+/INVITE JohnDoe #exampleChannel
+```
 
-
+In this example, the user `JohnDoe` is invited to join the channel `#exampleChannel`.
