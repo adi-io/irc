@@ -51,7 +51,7 @@ The `KICK` command removes a user from a channel.
 ```
 This removes `JohnDoe` from `#exampleChannel` with the comment "Spamming is not allowed".
 
-___________________________________
+======
 ### JOIN
 The `JOIN` command allows you to join a channel.
 
@@ -66,7 +66,7 @@ The `JOIN` command allows you to join a channel.
 ```
 This joins the channel `#exampleChannel`.
 
-___________________________________
+======
 ### TOPIC
 The `TOPIC` command sets or views the topic of a channel.
 
@@ -81,7 +81,7 @@ The `TOPIC` command sets or views the topic of a channel.
 ```
 This sets the topic of `#exampleChannel` to "New topic for the channel".
 
-___________________________________
+======
 ### MODE
 The `MODE` command changes the mode of a user or a channel.
 
@@ -96,7 +96,7 @@ The `MODE` command changes the mode of a user or a channel.
 ```
 This gives `JohnDoe` operator status in `#exampleChannel`.
 
-___________________________________
+======
 ### PART
 The `PART` command allows you to leave a channel.
 
@@ -111,7 +111,7 @@ The `PART` command allows you to leave a channel.
 ```
 This leaves the channel `#exampleChannel`.
 
-___________________________________
+======
 ### PRIVMSG
 The `PRIVMSG` command sends a private message to a user or a channel.
 
@@ -126,7 +126,7 @@ The `PRIVMSG` command sends a private message to a user or a channel.
 ```
 This sends the message "Hello, how are you?" to `JohnDoe`.
 
-___________________________________
+======
 ### QUIT
 The `QUIT` command disconnects you from the server.
 
@@ -141,7 +141,7 @@ The `QUIT` command disconnects you from the server.
 ```
 This disconnects you from the server with the comment "Goodbye!".
 
-___________________________________
+======
 ### INVITE
 The `INVITE` command invites a user to a channel.
 
