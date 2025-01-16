@@ -1,4 +1,5 @@
 #include "../include/server.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <iostream>
@@ -13,10 +14,7 @@ Server::Server()
     this -> ServerSocketFd = -1;
 }
 
-Server::~Server()
-{
-    // std::cout << "Destructor called" << std::endl;
-}
+Server::~Server(){}
 
 Server::Server(Server const &src)
 {

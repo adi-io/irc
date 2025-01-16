@@ -104,7 +104,7 @@ void    Server::NICK(std::string cmd, int fd)
 						SendResponse(RPL_CONNECTED(cli -> GetNickName()), fd);
 						SendResponse(RPL_NICKCHANGE(cli -> GetNickName(), cmd), fd);
 					}
-					else
+				else
 					{
 						SendResponse(RPL_NICKCHANGE(oldnick, cmd), fd);
 						return ;
