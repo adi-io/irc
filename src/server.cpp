@@ -15,7 +15,7 @@ Server::Server()
 
 Server::~Server()
 {
-    std::cout << "Destructor called" << std::endl;
+    // std::cout << "Destructor called" << std::endl;
 }
 
 Server::Server(Server const &src)
@@ -213,46 +213,71 @@ void    SendResponse(std::string response, int fd)
         std::cerr << "Response send() failed" << std::endl;
 }
 
-void Server::parse_exec_cmd(std::string &cmd, int fd)
+void Server::LIST(int fd, std::string cmd)
+{
+    std::stringstream response;
+    (void)cmd; // Silence the unused parameter warning
+    response << "Channels:\n";
+    for (size_t i = 0; i < this->channels.size(); i++) {
+        response << this->channels[i].GetName() << " - Users connected: " << this->channels[i].clientChannel_list() << "\n";
+    }
+
+    response << "Clients:\n";
+    for (size_t i = 0; i < this->clients.size(); i++) {
+        response << this->clients[i].GetNickName() << "\n";
+    }
+
+    SendResponse(response.str(), fd);
+}
+
+void Server::COMMANDS(std::string &cmd, int fd)
 {
     if (cmd.empty())
-        return ;
-    std::vector<std::string> splited_cmd = split_cmd(cmd);
-    size_t found = cmd.find_first_not_of(" \t\v");
-    if (found != std::string::npos)
-        cmd = cmd.substr(found);
-    if (splited_cmd.size() && (splited_cmd[0] == "BONG" || splited_cmd[0] == "bong"))
         return;
-    if (splited_cmd.size() && (splited_cmd[0] == "PASS" || splited_cmd[0] == "pass"))
-    client_authen(fd, cmd);
-    else if (splited_cmd.size() && (splited_cmd[0] == "NICK" || splited_cmd[0] == "nick"))
-    set_nickname(cmd,fd);
-    else if(splited_cmd.size() && (splited_cmd[0] == "USER" || splited_cmd[0] == "user"))
-    set_username(cmd, fd);
 
-    else if(notregistered(fd))
+    std::vector<std::string> splited_cmd = split_cmd(cmd);
+    if (splited_cmd.empty())
+        return;
+
+    std::string command = splited_cmd[0];
+    std::transform(command.begin(), command.end(), command.begin(), ::toupper);
+
+    if (command == "BONG")
+        return;
+
+    if (command == "PASS")
+        PASS(fd, cmd);
+    else if (command == "NICK")
+        NICK(cmd, fd);
+    else if (command == "USER")
+        USER(cmd, fd);
+    else if (command == "LIST") // THIS IS A DEV. ONLY COMMAND
+        LIST(fd, cmd);
+    else if (notregistered(fd))
     {
-        if (splited_cmd.size() && (splited_cmd[0] == "KICK" || splited_cmd[0] == "kick"))
-            std::cout << "command -> KICK" << std::endl;
-        else if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
+        if (command == "INVITE")
+            INVITE(fd, cmd);
+        else if (command == "KICK")
+            KICK(fd, cmd);
+        else if (command == "JOIN")
             JOIN(fd, cmd);
-		else if (splited_cmd.size() && (splited_cmd[0] == "TOPIC" || splited_cmd[0] == "topic"))
-		    TOPIC(fd, cmd);
-		else if (splited_cmd.size() && (splited_cmd[0] == "MODE" || splited_cmd[0] == "mode"))
-		    std::cout << "command -> MODE" << std::endl;
-		else if (splited_cmd.size() && (splited_cmd[0] == "PART" || splited_cmd[0] == "part"))
-		    std::cout << "command -> PART" << std::endl;
-
-		else if (splited_cmd.size() && (splited_cmd[0] == "PRIVMSG" || splited_cmd[0] == "privmsg"))
-			PRIVMSG(fd, cmd);
-
-		else if (splited_cmd.size())
-			SendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(),splited_cmd[0]),fd);
-
-	}
-
-    else if (!notregistered(fd))
-        SendResponse(ERR_NOTREGISTERED(std::string("*")),fd);
+        else if (command == "TOPIC")
+            TOPIC(fd, cmd);
+        else if (command == "MODE")
+            MODE(fd, cmd);
+        else if (command == "PRIVMSG")
+            PRIVMSG(fd, cmd);
+        else if (command == "PART")
+            PART(fd, cmd);
+        else if (command == "QUIT")
+            QUIT(fd, cmd);
+        else
+            SendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(), command), fd);
+    }
+    else
+    {
+        SendResponse(ERR_NOTREGISTERED(std::string("*")), fd);
+    }
 }
 
 void Server::accept_new_client()
@@ -281,7 +306,7 @@ void Server::accept_new_client()
     clients.push_back(cli);
     fds.push_back(new_cli);
 
-    std::cout << GRE << "Client <" << intcofd << " Connected" << std::endl;
+    std::cout << GRE << "Client <" << intcofd << "> Connected" << std::endl;
 }
 
 void    Server::reciveNewData(int fd)
@@ -294,7 +319,7 @@ void    Server::reciveNewData(int fd)
 
     if (bytes <= 0)
     {
-        std::cout << RED << "Client " << fd << " disconnected" << std::endl;
+        std::cout << RED << "Client <" << fd << "> disconnected" << std::endl;
         RmChannels(fd);
         RemoveClient(fd);
         RemoveFds(fd);
@@ -308,7 +333,7 @@ void    Server::reciveNewData(int fd)
 
         std::vector<std::string> cmd =  split_recivedBuffer(cli -> getBuffer());
         for (size_t i = 0; i < cmd.size(); i++)
-            parse_exec_cmd(cmd[i], fd);
+            COMMANDS(cmd[i], fd);
         if (GetClient(fd))
             GetClient(fd) -> clearBuffer();
     }
@@ -363,7 +388,7 @@ void    Server::close_fds()
         }
         if (ServerSocketFd != -1)
         {
-            std::cout << "Server " << ServerSocketFd << " Disconnected" << std::endl;
+            std::cout << "Server <" << ServerSocketFd << "> Disconnected" << std::endl;
             close(ServerSocketFd);
         }
 }
@@ -400,7 +425,7 @@ void    Server::init(int port, std::string pass)
     this -> password = pass;
     this -> set_sever_socket();
 
-    std::cout << GRE << "Server " << this -> ServerSocketFd << " Connected" << WHI << std::endl;
+    std::cout << GRE << "Server <" << this -> ServerSocketFd << "> Connected" << WHI << std::endl;
     std::cout << "Waiting for server connection" << std::endl;
 
     while(Server::signal == false)

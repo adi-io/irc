@@ -1,5 +1,5 @@
 ### TO RUN:
-./irc 8080 mypassword
+./ircserv 8080 mypassword
 
 
 

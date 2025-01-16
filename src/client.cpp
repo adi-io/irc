@@ -19,7 +19,7 @@ Client::Client()
 
 Client::~Client()
 {
-    std::cout << "Destructer called" << std::endl;
+    // std::cout << "Destructer called" << std::endl;
 }
 
 Client::Client(Client const &src)

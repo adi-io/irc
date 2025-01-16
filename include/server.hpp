@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <string>
 #include <cstring>
+#include <sstream>
 
 #include "replies.hpp"
 #include "client.hpp"
@@ -63,8 +64,8 @@ class Server
            	void AddClient(Client newClient);
            	void AddChannel(Channel newChannel);
            	void AddFds(pollfd newFd);
-           	void set_username(std::string& username, int fd);
-           	void set_nickname(std::string cmd, int fd);
+           	void USER(std::string& username, int fd);
+           	void NICK(std::string cmd, int fd);
            	//---------------//Remove Methods
            	void RemoveClient(int fd);
            	void RemoveChannel(std::string name);
@@ -85,19 +86,19 @@ class Server
            	//---------------//Parsing Methods
            	std::vector<std::string> split_recivedBuffer(std::string str);
            	std::vector<std::string> split_cmd(std::string &str);
-           	void parse_exec_cmd(std::string &cmd, int fd);
+           	void COMMANDS(std::string &cmd, int fd);
            	//---------------//Authentification Methods
            	bool notregistered(int fd);
            	bool nickNameInUse(std::string& nickname);
            	bool is_validNickname(std::string& nickname);
-           	void client_authen(int fd, std::string pass);
+           	void PASS(int fd, std::string pass);
 			// --------------//COMMANDS IMPLEMENTATION
 			// JOIN
-			void JOIN(int fd, std::string cmd);
-			int parseJoinCommand(std::string cmd, std::vector<std::pair<std::string, std::string> > channelKeys, int fd);
-			int clientCheckCount(std::string nick);
-			void handleJoinExistingChannel(int fd, std::vector<std::pair<std::string, std::string> > channelKeys, int i, int j);
-			void handleJoinNewChannel(int fd, std::vector<std::pair<std::string, std::string> > channelKeys, int i);
+			void	JOIN(int fd, std::string cmd);
+			int		SplitJoin(std::vector<std::pair<std::string, std::string> > &token, std::string cmd, int fd);
+			void	HandleJoinExistingChannel(std::vector<std::pair<std::string, std::string> >&token, int i, int j, int fd);
+			void	HandleJoinNewChannel(std::vector<std::pair<std::string, std::string> >&token, int i, int fd);
+			int		ClientCountCheck(std::string nickname);
 			// PRIVMSG
 			void PRIVMSG(int fd, std::string cmd);
 			void validateRecipients(std::vector<std::string> &tmp, int fd);
@@ -122,6 +123,15 @@ class Server
 			// KICK
 			void KICK(int fd, std::string cmd);
 			std::string ParseKickCommand(std::string cmd, std::vector<std::string> &tmp, std::string &user, int fd);
+			// PART
+			void	PART(int fd, std::string cmd);
+			int		SplitCmdPart(std::string cmd, std::vector<std::string> &tmp, std::string &reason, int fd);
+			// QUIT
+			void	QUIT(int fd, std::string cmd);
+
+
+			//
+			void	LIST(int fd, std::string cmd);
 };
 
 #endif

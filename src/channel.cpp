@@ -25,7 +25,7 @@ Channel::Channel()
 
 Channel::~Channel()
 {
-    std::cout << "Destructor called" << std::endl;
+    // std::cout << "Destructor called" << std::endl;
 }
 
 Channel::Channel(Channel const &src)
