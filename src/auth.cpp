@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <vector>
 
-void    Server::client_authen(int fd, std::string pass)
+void    Server::PASS(int fd, std::string pass)
 {
     Client  *cli = GetClient(fd);
     pass = pass.substr(4);
@@ -34,7 +34,7 @@ void    Server::client_authen(int fd, std::string pass)
 
 bool Server::is_validNickname(std::string& nickname)
 {
-    std::cout << "Validating nickname: " << nickname << std::endl;
+    // std::cout << "Validating nickname: " << nickname << std::endl;
     if ((!nickname.empty() && nickname[0] == '#') || nickname[0] == '&' || nickname[0] == ':')
     {
         std::cout << "Invalid start character: " << nickname[0] << std::endl;
@@ -61,7 +61,7 @@ bool    Server::nickNameInUse(std::string& nickname)
     return (false);
 }
 
-void    Server::set_nickname(std::string cmd, int fd)
+void    Server::NICK(std::string cmd, int fd)
 {
     std::string inuse;
     Client  *cli = GetClient(fd);
@@ -124,7 +124,7 @@ void    Server::set_nickname(std::string cmd, int fd)
     }
 }
 
-void    Server::set_username(std::string &cmd, int fd)
+void    Server::USER(std::string &cmd, int fd)
 {
     std::vector<std::string> splited_cmds = split_cmd(cmd);
     Client *cli = GetClient(fd);
@@ -135,7 +135,7 @@ void    Server::set_username(std::string &cmd, int fd)
     if (cli && !cli -> GetUserName().empty())
         SendResponse(ERR_ALREADYREGISTERED(cli -> GetNickName()), fd);
     else
-        cli -> SetUsername(cmd);
+        cli -> SetUsername(splited_cmds[1]);
     if (cli && cli -> getRegistered() && !cli -> GetUserName().empty()
         && !cli -> GetNickName().empty() && cli -> GetNickName() != "*" && !cli -> GetLogedIn())
     {

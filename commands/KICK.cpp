@@ -46,7 +46,6 @@
 // //                                    from WiZ to remove John from channel
 
 #include "../include/server.hpp"
-#include <sstream>
 
 /**
  * @brief Extracts a substring from the command string starting after the specified keyword.
