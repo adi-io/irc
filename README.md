@@ -1,7 +1,10 @@
 ### TO RUN:
-compile with make
-
-./ircserv 6667 mypassword
+1. compile with make
+2. ./ircserv 6667 mypassword
+3. in another terminal: nc localhost 6667
+4. PASS mypassword
+5. NICK <display_name>
+6. USER <display_name> 0 * :<first_name last_name>
 
 
 
