@@ -36,6 +36,7 @@
 
 #include "../include/server.hpp"
 #include <sstream>
+#include <ctime>
 
 std::string Server::tTopic()
 {

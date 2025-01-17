@@ -267,20 +267,25 @@ void    Channel::add_admin(Client newadmin)
 
 void    Channel::remove_client(int fd)
 {
-    for (size_t i = 0; i < this-> clients.size(); i++)
-    {
-        if (this -> clients[i].GetFd() == fd)
-            this -> clients.erase(i + clients.begin());
-    }
+	for (std::vector<Client>::iterator it = clients.begin(); it != clients.end(); ++it)
+	{
+		if (it->GetFd() == fd)
+		{
+			clients.erase(it);
+			break;
+		}
+	}
 }
-
 void    Channel::remove_admin(int fd)
 {
-    for (size_t i = 0; i < this-> admins.size(); i++)
-    {
-        if (this -> admins[i].GetFd() == fd)
-            this -> admins.erase(i + clients.begin());
-    }
+	for (std::vector<Client>::iterator it = admins.begin(); it != admins.end(); ++it)
+	{
+		if (it->GetFd() == fd)
+		{
+			admins.erase(it);
+			break;
+		}
+	}
 }
 
 bool    Channel::change_clientToAdmin(std::string& nick)

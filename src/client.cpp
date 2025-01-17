@@ -32,7 +32,6 @@ Client&  Client::operator=(Client const &src)
     if (this != &src)
     {
         this -> fd = src.fd;
-        this -> isOperator = src.isOperator;
         this -> registered = src.registered;
         this -> nickname = src.nickname;
         this -> logedin = src.logedin;

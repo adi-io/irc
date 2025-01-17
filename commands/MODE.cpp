@@ -10,6 +10,7 @@
 
 #include "../include/server.hpp"
 #include <sstream>
+#include <cstdlib>
 
 // Validates the password
 bool Tool_PasswordValidator(std::string password)
@@ -104,7 +105,7 @@ std::string Server::ModeTopicRestriction(Channel *channel ,char oprtr, std::stri
 		channel->SetModeAtindex(1, false);
 		channel->SetTopicRestriction(false);
 		param =  mode_toAppend(chain, oprtr, 't');
-	}	
+	}
 	return param;
 }
 
@@ -141,7 +142,7 @@ std::string Server::ModePassword(std::vector<std::string> tokens, Channel *chann
 	else if (oprtr == '-' && channel->GetModeAtIndex(2))
 	{
 		if(pass == channel->GetPassword())
-		{		
+		{
 			channel->SetModeAtindex(2, false);
 			channel->SetPassword("");
 			param = mode_toAppend(chain,oprtr, 'k');
@@ -261,7 +262,7 @@ void Server::MODE(int fd, std::string &cmd)
 		cmd = cmd.substr(found);
 	else
 	{
-		SendResponse(ERR_NOTENOUGHPARAM(cli->GetNickName()), fd); 
+		SendResponse(ERR_NOTENOUGHPARAM(cli->GetNickName()), fd);
 		return ;
 	}
 	Tool_GetCmdArgs(cmd ,channelName, modeset ,params);
@@ -311,7 +312,7 @@ void Server::MODE(int fd, std::string &cmd)
 		}
 	}
 	std::string chain = mode_chain.str();
-	if(chain.empty())
-		return ;
+	if (chain.empty())
+	   return ;
  	channel->sendTo_all(RPL_CHANGEMODE(cli->getHostname(), channel->GetName(), mode_chain.str(), arguments));
 }
