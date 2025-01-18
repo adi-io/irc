@@ -109,11 +109,11 @@ class Server
 			int getpos(std::string &cmd);
 			// MODE
 			void MODE(int fd, std::string &cmd);
-			std::string ModeInviteOnly(Channel *channel, char oprtr, std::string chain);
-			std::string ModeTopicRestriction(Channel *channel ,char oprtr, std::string chain);
-			std::string ModePassword(std::vector<std::string> splited, Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string& arguments);
-			std::string ModePrivilegeToggle(std::vector<std::string> splited, Channel *channel, size_t& pos, int fd, char oprtr, std::string chain, std::string& arguments);
-			std::string ModeLimit(std::vector<std::string> splited, Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string& arguments);
+			std::string inviteOnlyToggleMod(Channel *channel, char oprtr, std::string chain);
+			std::string topicRestrictionMod(Channel *channel ,char oprtr, std::string chain);
+			std::string passwordMod(std::vector<std::string> splited, Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string& arguments);
+			std::string userPrivilegeMod(std::vector<std::string> splited, Channel *channel, size_t& pos, int fd, char oprtr, std::string chain, std::string& arguments);
+			std::string userLimitMode(std::vector<std::string> splited, Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string& arguments);
 			bool		Tool_LimitValidator(std::string& limit);
 			std::string mode_toAppend(std::string chain, char oprtr, char mode);
 			std::vector<std::string> Tool_SplitParams(std::string params);

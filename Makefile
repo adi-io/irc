@@ -39,6 +39,7 @@ $(OBJ_DIR)/%.o: %.cpp
 		"$$(( $(PROGRESS) * 100 / $(TOTAL_FILES) ))"
 
 fclean: clean
+	@clear
 	@rm -rf $(NAME)
 	@rm -rf $(OBJ_DIR)
 

@@ -70,5 +70,26 @@ void Server::PRIVMSG(int fd, std::string cmd)
 	if (tmp.size() > 10) //ERR_TOOMANYTARGETS (407) // if the client send the message to more than 10 clients
 		{SendError(407, GetClient(fd)->GetNickName(), GetClient(fd)->GetFd(), " :Too many recipients\r\n"); return;}
 	validateRecipients(tmp, fd); // check if the channels and clients exist
-	std::cout << "PRIVMSG " << message << std::endl;
+	for (size_t i = 0; i < tmp.size(); i++)
+	{
+		std::string recipient = tmp[i];
+		std::string resp = ":" + GetClient(fd)->GetNickName() + "!~" + GetClient(fd)->GetUserName() + "@localhost PRIVMSG " + recipient + " :" + message + "\r\n";
+		if (recipient[0] == '#')
+		{
+			recipient.erase(recipient.begin());
+			Channel* channel = GetChannel(recipient);
+			if (channel)
+				channel->sendTo_all(resp, fd);
+			else
+				SendError(401, "#" + recipient, GetClient(fd)->GetFd(), " :No such channel\r\n");
+		}
+		else
+		{
+			Client* client = GetClientNick(recipient);
+			if (client)
+				SendResponse(resp, client->GetFd());
+			else
+				SendError(401, recipient, GetClient(fd)->GetFd(), " :No such nick\r\n");
+		}
+	}
 }

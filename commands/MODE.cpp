@@ -1,12 +1,29 @@
-// ∗ MODE - Change the channel’s mode:
-// · i: Set/remove Invite-only channel
-// · t: Set/remove the restrictions of the TOPIC command to channel
-// operators
-// · k: Set/remove the channel key (password)
-// · o: Give/take channel operator privilege
-// 5
-// ft_irc Internet Relay Chat
-// · l: Set/remove the user limit to channel
+// // ∗ MODE - Change the channel’s mode:
+
+// Set/Remove Invite-only mode (i)
+// /MODE #channel +i    // Set channel to invite-only
+// /MODE #channel -i    // Remove invite-only restriction
+
+// Set/Remove Topic Restriction (t)
+// /MODE #channel +t    // Only operators can change topic
+// /MODE #channel -t    // Anyone can change topic
+
+// Set/Remove Channel Password (k)
+// /MODE #channel +k password    // Set channel password
+// /MODE #channel -k password    // Remove channel password
+
+// Give/Take Operator Status (o)
+// /MODE #channel +o nickname    // Give operator status
+// /MODE #channel -o nickname    // Remove operator status
+
+// Set/Remove User Limit (l)
+// /MODE #channel +l 10    // Set user limit to 10
+// /MODE #channel -l      // Remove user limit
+
+// You can also combine multiple modes
+// /MODE #channel +tk password    // Set topic restriction and password
+// /MODE #channel +il 5          // Set invite-only and limit to 5 users
+
 
 #include "../include/server.hpp"
 #include <sstream>
@@ -70,7 +87,7 @@ std::vector<std::string> Server::Tool_SplitParams(std::string params)
 	return tokens;
 }
 
-std::string Server::ModeInviteOnly(Channel *channel, char oprtr, std::string chain)
+std::string Server::inviteOnlyToggleMod(Channel *channel, char oprtr, std::string chain)
 {
 	std::string param;
 	param.clear();
@@ -90,7 +107,7 @@ std::string Server::ModeInviteOnly(Channel *channel, char oprtr, std::string cha
 }
 
 // Set/remove the restrictions of the TOPIC command to channel operators
-std::string Server::ModeTopicRestriction(Channel *channel ,char oprtr, std::string chain)
+std::string Server::topicRestrictionMod(Channel *channel ,char oprtr, std::string chain)
 {
 	std::string param;
 	param.clear();
@@ -109,9 +126,8 @@ std::string Server::ModeTopicRestriction(Channel *channel ,char oprtr, std::stri
 	return param;
 }
 
-
 // Handles the password mode
-std::string Server::ModePassword(std::vector<std::string> tokens, Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string &arguments)
+std::string Server::passwordMod(std::vector<std::string> tokens, Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string &arguments)
 {
 	std::string param;
 	std::string pass;
@@ -154,7 +170,7 @@ std::string Server::ModePassword(std::vector<std::string> tokens, Channel *chann
 }
 
 // Handles the operator privilege mode
-std::string Server::ModePrivilegeToggle(std::vector<std::string> tokens, Channel *channel, size_t& pos, int fd, char oprtr, std::string chain, std::string& arguments)
+std::string Server::userPrivilegeMod(std::vector<std::string> tokens, Channel *channel, size_t& pos, int fd, char oprtr, std::string chain, std::string& arguments)
 {
 	std::string user;
 	std::string param;
@@ -206,7 +222,7 @@ bool Server::Tool_LimitValidator(std::string& limit)
 }
 
 // Handles the channel limit mode
-std::string Server::ModeLimit(std::vector<std::string> tokens,  Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string& arguments)
+std::string Server::userLimitMode(std::vector<std::string> tokens,  Channel *channel, size_t &pos, char oprtr, int fd, std::string chain, std::string& arguments)
 {
 	std::string limit;
 	std::string param;
@@ -252,7 +268,7 @@ void Server::MODE(int fd, std::string &cmd)
 	std::stringstream mode_chain;
 	std::string arguments = ":";
 	Channel *channel;
-	char oprtr = '\0';
+	char opera = '\0';
 
 	arguments.clear();
 	mode_chain.clear();
@@ -262,7 +278,7 @@ void Server::MODE(int fd, std::string &cmd)
 		cmd = cmd.substr(found);
 	else
 	{
-		SendResponse(ERR_NOTENOUGHPARAM(cli->GetNickName()), fd);
+		SendResponse(ERR_NOTENOUGHPARAM(cli->GetNickName()), fd); 
 		return ;
 	}
 	Tool_GetCmdArgs(cmd ,channelName, modeset ,params);
@@ -293,26 +309,26 @@ void Server::MODE(int fd, std::string &cmd)
 		for(size_t i = 0; i < modeset.size(); i++)
 		{
 			if(modeset[i] == '+' || modeset[i] == '-')
-				oprtr = modeset[i];
+				opera = modeset[i];
 			else
 			{
 				if(modeset[i] == 'i')//invite mode
-					mode_chain << ModeInviteOnly(channel , oprtr, mode_chain.str());
+					mode_chain << inviteOnlyToggleMod(channel , opera, mode_chain.str());
 				else if (modeset[i] == 't') //topic restriction mode
-					mode_chain << ModeTopicRestriction(channel, oprtr, mode_chain.str());
+					mode_chain << topicRestrictionMod(channel, opera, mode_chain.str());
 				else if (modeset[i] == 'k') //password set/remove
-					mode_chain <<  ModePassword(tokens, channel, pos, oprtr, fd, mode_chain.str(), arguments);
+					mode_chain <<  passwordMod(tokens, channel, pos, opera, fd, mode_chain.str(), arguments);
 				else if (modeset[i] == 'o') //set/remove user operator privilege
-						mode_chain << ModePrivilegeToggle(tokens, channel, pos, fd, oprtr, mode_chain.str(), arguments);
+						mode_chain << userPrivilegeMod(tokens, channel, pos, fd, opera, mode_chain.str(), arguments);
 				else if (modeset[i] == 'l') //set/remove channel limits
-					mode_chain << ModeLimit(tokens, channel, pos, oprtr, fd, mode_chain.str(), arguments);
+					mode_chain << userLimitMode(tokens, channel, pos, opera, fd, mode_chain.str(), arguments);
 				else
 					SendResponse(ERR_UNKNOWNMODE(cli->GetNickName(), channel->GetName(),modeset[i]),fd);
 			}
 		}
 	}
 	std::string chain = mode_chain.str();
-	if (chain.empty())
-	   return ;
+	if(chain.empty())
+		return ;
  	channel->sendTo_all(RPL_CHANGEMODE(cli->getHostname(), channel->GetName(), mode_chain.str(), arguments));
 }
