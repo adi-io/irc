@@ -15,25 +15,22 @@ This guide shows how to set up a lightweight IRC client without system-level ins
 
 ## Step 1: Get a Terminal-based Client
 
-Download `weechat-curses` portable version:
-```bash
-curl -O https://weechat.org/files/portable/weechat-portable.tar.gz
-tar xzf weechat-portable.tar.gz
-cd weechat-portable
-```
+Download `weechat'
 
 ## Step 2: Launch the Client
 ```bash
-./weechat-curses
+weechat
 ```
 
 ## Step 3: Configure
 
 Basic configuration commands:
-1. Set nickname: `/nick yournickname`
-2. Add server: `/server add libera irc.libera.chat`
-3. Connect: `/connect libera`
-4. Join channel: `/join #channelname`
+```bash
+/server del IRC_42
+/server add IRC_42 localhost -password=asd -username=mark -nicks=mark -realname="mark hawk" -tls=off
+/connect IRC_42
+```
+> importantly make sure to add -tls=off! SSL connection is *not* feasible due to external library limitations.
 
 ## Additional Resources
 

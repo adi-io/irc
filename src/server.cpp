@@ -49,7 +49,11 @@ int Server::GetPort()
 std::string  Server::GetPassword()
 {
     return (this -> password);
+}
 
+std::string  Server::GetServerName()
+{
+    return ("localhost");
 }
 
 Client  *Server::GetClient(int fd)
@@ -269,6 +273,10 @@ void Server::COMMANDS(std::string &cmd, int fd)
             PART(fd, cmd);
         else if (command == "QUIT")
             QUIT(fd, cmd);
+        else if (command == "PING")
+            PING(fd, cmd);
+        else if (command == "PONG")
+            PONG(fd, cmd);
         else
             SendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(), command), fd);
     }

@@ -57,6 +57,7 @@ class Server
            	Client *GetClient(int fd);
            	Client *GetClientNick(std::string nickname);
            	Channel *GetChannel(std::string name);
+			std::string GetServerName();
            	//---------------//Setters
            	void SetFd(int server_fdsocket);
            	void SetPort(int port);
@@ -128,7 +129,9 @@ class Server
 			int		SplitCmdPart(std::string cmd, std::vector<std::string> &tmp, std::string &reason, int fd);
 			// QUIT
 			void	QUIT(int fd, std::string cmd);
-
+			// PING & PONG
+			void	PING(int fd, std::string cmd);
+			void	PONG(int fd, std::string cmd);
 
 			//
 			void	LIST(int fd, std::string cmd);
