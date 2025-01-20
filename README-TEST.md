@@ -26,7 +26,7 @@ weechat
 
 Basic configuration commands:
 ```bash
-/server del IRC_42
+/server del IRC_42  //optional command
 /server add IRC_42 localhost -password=asd -username=mark -nicks=mark -realname="mark hawk" -tls=off
 /connect IRC_42
 ```
