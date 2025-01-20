@@ -5,7 +5,7 @@ INCLUDES = -I./include
 
 # Source files
 SRC = main.cpp src/auth.cpp src/channel.cpp src/client.cpp src/server.cpp
-COMMANDS = commands/PRIVMSG.cpp commands/JOIN.cpp commands/TOPIC.cpp commands/INVITE.cpp commands/MODE.cpp commands/KICK.cpp commands/PART.cpp commands/KICK.cpp commands/QUIT.cpp commands/PING-PONG.cpp
+COMMANDS = commands/PRIVMSG.cpp commands/JOIN.cpp commands/TOPIC.cpp commands/INVITE.cpp commands/MODE.cpp commands/KICK.cpp commands/PART.cpp commands/KICK.cpp commands/QUIT.cpp commands/PING-PONG.cpp commands/CAP.cpp
 SRC += $(COMMANDS)
 
 # Object files

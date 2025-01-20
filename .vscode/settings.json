@@ -63,6 +63,23 @@
 		"stack": "cpp",
 		"execution": "cpp",
 		"memory": "cpp",
-		"print": "cpp"
+		"print": "cpp",
+		"bit": "cpp",
+		"*.tcc": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"list": "cpp",
+		"functional": "cpp",
+		"iterator": "cpp",
+		"memory_resource": "cpp",
+		"numeric": "cpp",
+		"random": "cpp",
+		"type_traits": "cpp",
+		"utility": "cpp",
+		"numbers": "cpp",
+		"ranges": "cpp",
+		"span": "cpp",
+		"cinttypes": "cpp",
+		"typeindex": "cpp"
 	}
 }

@@ -277,6 +277,8 @@ void Server::COMMANDS(std::string &cmd, int fd)
             PING(fd, cmd);
         else if (command == "PONG")
             PONG(fd, cmd);
+        else if (command == "CAP")
+            CAP(fd, cmd);
         else
             SendResponse(ERR_CMDNOTFOUND(GetClient(fd)->GetNickName(), command), fd);
     }

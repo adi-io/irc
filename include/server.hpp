@@ -132,6 +132,8 @@ class Server
 			// PING & PONG
 			void	PING(int fd, std::string cmd);
 			void	PONG(int fd, std::string cmd);
+			// CAP
+			void     CAP(int fd, std::string cmd);
 
 			//
 			void	LIST(int fd, std::string cmd);
